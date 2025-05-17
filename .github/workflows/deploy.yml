@@ -1,0 +1,29 @@
+name: Deploy to GCE
+
+on:
+  workflow_run:
+    workflows: ["Build and Push to Docker Hub"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Deploy to GCE
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.GCE_IP }}
+          username: ${{ secrets.GCE_USERNAME }}
+          key: ${{ secrets.GCE_SSH_KEY }}
+          script: |
+            docker pull cynosnexus/cynos:latest
+            docker stop cynos || true
+            docker rm cynos || true
+            docker image prune -f
+            docker run -d --name cynos \
+              --network host \
+              --env-file /home/${{ secrets.GCE_USERNAME }}/.env \
+              -u root \
+              cynosnexus/cynos:latest
