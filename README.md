@@ -1,4 +1,4 @@
-# CI/CD Pipeline for Nestjs Backend (Mock)
+# CICD Pipeline for Nestjs Backend (Mock)
 
 This directory contains the GitHub Actions workflows that implement the CI/CD pipeline for the Nestjs backend application.
 
